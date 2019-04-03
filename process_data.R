@@ -126,13 +126,14 @@ daily_dat <- licorDat %>%
             meanSM = mean(SMoisture), meanTemp = mean(T5))
 
 cat("Plotting data...\n")
-ggplot(daily_dat, aes(x = Collar, y = meanFlux)) + 
+ggplot(daily_dat, aes(x = Timestamp, y = meanFlux, group = Tree, color = as.factor(Tree))) + 
   geom_point() +
+  geom_line() +
   facet_wrap(~Plot) #this lets you separate the data by a subset
 
 
 cat("Saving data...\n")
 write_csv(licorDat, "licor_output.csv")
-write_csv(dailyDat, "dailtDat.csv")
+write_csv(daily_dat, "daily_dat.csv")
 
 cat("All done.\n")
