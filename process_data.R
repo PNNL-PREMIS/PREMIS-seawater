@@ -109,7 +109,7 @@ read_licor_dir("../PREMIS-seawater/licor_data/")  %>%
   rawDat
 
 cat("Joining data...\n")
-collarDat <- read_csv("../PREMIS-seawater/design/fluxcollars_subset.csv") %>%
+collarDat <- read_csv("../PREMIS-stormsurge/design/cores_collars.csv") %>%
   mutate(Collar = as.character(Collar))
 
 left_join(rawDat, collarDat, by = "Collar") %>% 
@@ -119,17 +119,20 @@ left_join(rawDat, collarDat, by = "Collar") %>%
 cat("Calculating daily averages, CVs, etc...\n")
 # this step averages the two measurements that the licor takes at a given collar
 daily_dat <- licorDat %>%
-  group_by(Date, Plot, Tree, Collar) %>%
+  group_by(Date, Plot) %>%
   summarise(n = n(), 
             Timestamp = mean(Timestamp),
             meanFlux = mean(Flux), sdFlux = sd(Flux), 
-            meanSM = mean(SMoisture), meanTemp = mean(T5))
+            meanSM = mean(SMoisture), meanTemp = mean(T5)) %>% 
+  drop_na()
 
 cat("Plotting data...\n")
-ggplot(daily_dat, aes(x = Timestamp, y = meanFlux, group = Tree, color = as.factor(Tree))) + 
+
+ggplot(daily_dat, aes(x = Timestamp, y = meanFlux, color = Plot)) + 
   geom_point() +
   geom_line() +
-  facet_wrap(~Plot) #this lets you separate the data by a subset
+  theme_minimal() +
+  labs(y = "Flux")
 
 
 cat("Saving data...\n")
